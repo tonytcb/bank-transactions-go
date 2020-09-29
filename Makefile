@@ -1,4 +1,10 @@
 #!make
 
 up:
-	echo "todo"
+	docker-compose up &
+
+stop:
+	docker-compose stop
+
+restart:
+	docker-compose restart
