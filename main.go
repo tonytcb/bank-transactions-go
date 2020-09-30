@@ -2,19 +2,19 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"os"
+
+	"github.com/tonytcb/bank-transactions-go/api"
+	"github.com/tonytcb/bank-transactions-go/api/http"
 )
 
 func main() {
-	log.Println("starting app")
+	var (
+		logger                = log.New(os.Stdout, "", log.LstdFlags|log.Lmicroseconds)
+		httpServer api.Server = http.NewServer(logger)
+	)
 
-	var handler http.HandlerFunc = func(rw http.ResponseWriter, req *http.Request) {
-		log.Println("received request:", req)
+	logger.Println("starting app")
 
-		rw.Write([]byte("200 OK"))
-	}
-
-	if err := http.ListenAndServe(":8080", handler); err != nil {
-		log.Fatalln("starting http server error:", err.Error())
-	}
+	httpServer.Listen()
 }
