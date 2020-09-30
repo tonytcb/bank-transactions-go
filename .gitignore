@@ -17,3 +17,6 @@ vendor/
 
 # IDE's
 .idea/
+
+# Credentials file
+.env

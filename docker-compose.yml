@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  bank-transaction:
+  app:
     container_name: bank-transaction-app
     ports:
       - "8080:8080"
@@ -9,19 +9,21 @@ services:
       context: .
       dockerfile: Dockerfile
     command: fresh
-    network_mode: host
+#    network_mode: host
     volumes:
       - .:/app
-#    depends_on:
-#      - bank-transaction-mysql
+    env_file:
+      - .env
+    depends_on:
+      - mysql
 
-#  bank-transaction-mysql:
-#    container_name: bank-transaction-mysql
-#    image: mysql:5.7
-#    environment:
-#      MYSQL_ROOT_PASSWORD: "dev"
-#      MYSQL_DATABASE: "dev"
-#    ports:
-#      - "3306:3306"
-#    volumes:
-#      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:rw
+  mysql:
+    container_name: "bank-transaction-mysql"
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "dev"
+      MYSQL_DATABASE: "bank-transaction"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:rw
