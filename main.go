@@ -20,6 +20,7 @@ func main() {
 		logger.Fatalln("error to create storage:", err.Error())
 		return
 	}
+	defer db.Close()
 
 	var httpServer api.Server = http.NewServer(logger, db)
 

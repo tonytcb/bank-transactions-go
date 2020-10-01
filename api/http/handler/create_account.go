@@ -5,14 +5,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
-	"strings"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/tonytcb/bank-transactions-go/domain"
+	"github.com/tonytcb/bank-transactions-go/infra/repository"
 )
-
-// @todo create unit tests
 
 // AccountCreator defines the behaviour about how to create an account
 type AccountCreator interface {
@@ -30,7 +26,7 @@ func NewCreateAccount(logger *log.Logger, accountCreator AccountCreator) *Create
 	return &CreateAccount{logger: logger, accountCreator: accountCreator}
 }
 
-// Handler exposes the feature as an http handler
+// Handler exposes the http handler
 func (h CreateAccount) Handler(rw http.ResponseWriter, req *http.Request) {
 	responder := newResponder(rw)
 
@@ -43,8 +39,11 @@ func (h CreateAccount) Handler(rw http.ResponseWriter, req *http.Request) {
 
 	request := &createAccountPayloadRequest{}
 	if err := json.Unmarshal(payload, request); err != nil {
-		h.logger.Println("create account unmarshal payload error:", err)
-		responder.internalServerError()
+		h.logger.Println("invalid payload:", err)
+
+		errResponse := newErrorResponse(map[string]string{"root": "payload must be a valid JSON"})
+		responder.badRequest(errResponse.Encode())
+
 		return
 	}
 	defer req.Body.Close()
@@ -61,61 +60,38 @@ func (h CreateAccount) Handler(rw http.ResponseWriter, req *http.Request) {
 
 	account, err := h.accountCreator.Create(request.Document.Number)
 	if err != nil {
-		errResponse := newErrorResponse(map[string]string{"field-name": err.Error()})
-
 		h.logger.Println("unable to create account:", err)
-		responder.badRequest(errResponse.Encode())
+
+		if v, ok := err.(*repository.ErrDuplicateEntry); ok {
+			h.translateDuplicateError(responder, v)
+			return
+		}
+
+		if v, ok := err.(*domain.ErrDomain); ok {
+			h.translateDomainError(responder, v)
+			return
+		}
+
+		// unknown error
+		responder.internalServerError()
 		return
 	}
 
-	response := newCreateAccountResponse(account.ID().Value(), account.Document().Number().String())
+	response := newCreateAccountResponse(
+		account.ID().Value(),
+		account.Document().Number().String(),
+		account.CreatedAt(),
+	)
 
 	responder.created(response.Encode())
 }
 
-type createAccountPayloadRequest struct {
-	Document struct {
-		Number string `json:"number" validate:"required,number,len=11"`
-	}
+func (h CreateAccount) translateDuplicateError(r *responder, err *repository.ErrDuplicateEntry) {
+	errResponse := newErrorResponse(map[string]string{err.Field(): err.Error()})
+	r.conflict(errResponse.Encode())
 }
 
-func (c *createAccountPayloadRequest) sanitize() {
-	numberRegex, err := regexp.Compile(`[0-9]+`)
-	if err != nil {
-		return
-	}
-
-	if parts := numberRegex.FindAllString(c.Document.Number, -1); len(parts) > 0 {
-		c.Document.Number = strings.Join(parts, "")
-	}
-}
-
-func (c *createAccountPayloadRequest) validate() map[string]string {
-	if err := validate.Struct(c); err != nil {
-		return translateValidations(err.(validator.ValidationErrors))
-	}
-
-	return nil
-}
-
-type createAccountResponseDocumentResponse struct {
-	Number string `json:"number"`
-}
-
-type createAccountResponse struct {
-	ID       uint64                                `json:"id"`
-	Document createAccountResponseDocumentResponse `json:"document"`
-}
-
-func newCreateAccountResponse(ID uint64, documentNumber string) createAccountResponse {
-	return createAccountResponse{
-		ID:       ID,
-		Document: createAccountResponseDocumentResponse{Number: documentNumber},
-	}
-}
-
-func (c createAccountResponse) Encode() []byte {
-	res, _ := json.Marshal(c)
-
-	return res
+func (h CreateAccount) translateDomainError(r *responder, err *domain.ErrDomain) {
+	errResponse := newErrorResponse(map[string]string{err.Field(): err.Error()})
+	r.unprocessableEntity(errResponse.Encode())
 }

@@ -10,7 +10,6 @@ import (
 	entranslations "github.com/go-playground/validator/v10/translations/en"
 )
 
-// use a single instance of Validate, it caches struct info
 var (
 	validate *validator.Validate
 	uni      *ut.UniversalTranslator

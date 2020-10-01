@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"github.com/pkg/errors"
 	"github.com/tonytcb/bank-transactions-go/domain"
 )
 
@@ -15,18 +14,18 @@ func NewCreateAccount(repo domain.AccountRepository) *CreateAccount {
 	return &CreateAccount{repo: repo}
 }
 
-// Create
+// Create creates a account
 func (c CreateAccount) Create(documentNumber string) (*domain.Account, error) {
 	account, err := domain.NewAccount(domain.DocumentNumber(documentNumber))
 	if err != nil {
-		// todo improve the error system
-		return nil, errors.Wrap(err, "domain error")
+		// todo add context to the error
+		return nil, err
 	}
 
 	acc, err := account.Store(c.repo)
 	if err != nil {
-		// todo improve the error system
-		return nil, errors.Wrap(err, "storage error")
+		// todo add context to the error
+		return nil, err
 	}
 
 	return acc, nil

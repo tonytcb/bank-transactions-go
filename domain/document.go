@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/Nhanderu/brdoc"
 )
@@ -9,6 +9,7 @@ import (
 // DocumentNumber represents the document's number
 type DocumentNumber string
 
+// String cast the document number value to string
 func (d DocumentNumber) String() string {
 	return string(d)
 }
@@ -20,9 +21,10 @@ type Document struct {
 
 // NewDocument build a new Documents with its dependencies
 func NewDocument(number DocumentNumber) (*Document, error) {
+	// todo improve the document validation to be easier to add more documents types
+
 	if !brdoc.IsCPF(string(number)) {
-		//return nil, NewErrDomain("number", "must be a valid brazilian document number")
-		return nil, errors.New("document number must be a valid CPF")
+		return nil, NewErrDomain("document.number", fmt.Sprintf("'%s' is not a valid CPF", number))
 	}
 
 	return &Document{number: number}, nil

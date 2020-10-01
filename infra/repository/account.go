@@ -2,7 +2,9 @@ package repository
 
 import (
 	"database/sql"
+	"regexp"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
 	"github.com/tonytcb/bank-transactions-go/domain"
 )
@@ -17,7 +19,7 @@ func NewAccount(conn *sql.DB) *Account {
 	return &Account{conn: conn}
 }
 
-// Store stores an account into the database
+// Store stores an account in the storage
 func (a Account) Store(acc *domain.Account) (*domain.ID, error) {
 	var query = `
 		INSERT INTO accounts (document_number)
@@ -30,9 +32,13 @@ func (a Account) Store(acc *domain.Account) (*domain.ID, error) {
 	}
 
 	result, err := stmt.Exec(acc.Document().Number().String())
-
 	if err != nil {
-		return nil, errors.Wrap(err, "error to create account")
+
+		if v, ok := err.(*mysql.MySQLError); ok {
+			return nil, a.translateMySqlErrors(v)
+		}
+
+		return nil, errors.Wrap(err, "database error")
 	}
 
 	id, err := result.LastInsertId()
@@ -41,4 +47,20 @@ func (a Account) Store(acc *domain.Account) (*domain.ID, error) {
 	}
 
 	return domain.NewID(uint64(id)), nil
+}
+
+func (a Account) translateMySqlErrors(err *mysql.MySQLError) error {
+	const (
+		duplicateEntryCode = 1062
+	)
+
+	if err.Number == duplicateEntryCode {
+		duplicatedErrorRegex := regexp.MustCompile(`Duplicate entry '(\w+)' for key '(\w+)'`)
+
+		if match := duplicatedErrorRegex.FindAllStringSubmatch(err.Message, -1); len(match) > 0 {
+			return NewErrDuplicatedEntry(match[0][2], match[0][1])
+		}
+	}
+
+	return err
 }

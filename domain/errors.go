@@ -8,6 +8,18 @@ type ErrDomain struct {
 	rootReason  string
 }
 
+func (e ErrDomain) Field() string {
+	return e.field
+}
+
+func (e ErrDomain) Description() string {
+	return e.description
+}
+
+func (e ErrDomain) RootReason() string {
+	return e.rootReason
+}
+
 func NewErrDomain(field string, description string) *ErrDomain {
 	return &ErrDomain{field: field, description: description}
 }

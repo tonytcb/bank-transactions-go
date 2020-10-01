@@ -25,3 +25,15 @@ func (s responder) badRequest(payload []byte) {
 	s.rw.WriteHeader(http.StatusBadRequest)
 	s.rw.Write(payload)
 }
+
+func (s responder) conflict(payload []byte) {
+	s.rw.Header().Set("Content-Type", "application/json")
+	s.rw.WriteHeader(http.StatusConflict)
+	s.rw.Write(payload)
+}
+
+func (s responder) unprocessableEntity(payload []byte) {
+	s.rw.Header().Set("Content-Type", "application/json")
+	s.rw.WriteHeader(http.StatusUnprocessableEntity)
+	s.rw.Write(payload)
+}
