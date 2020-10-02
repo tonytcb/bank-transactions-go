@@ -25,7 +25,7 @@ func TestCreateAccount(t *testing.T) {
 		{
 			name: "domain error when the document number is invalid",
 			fields: fields{
-				repo: domain.NewAccountMock(nil, nil),
+				repo: domain.NewAccountMock(nil, nil, nil),
 			},
 			args: args{
 				documentNumber: "00000000000",
@@ -35,7 +35,7 @@ func TestCreateAccount(t *testing.T) {
 		{
 			name: "domain error when the document numbers is duplicate",
 			fields: fields{
-				repo: domain.NewAccountMock(nil, repository.NewErrDuplicatedEntry("document number", "duplicate entry 00000000191")),
+				repo: domain.NewAccountMock(nil, nil, repository.NewErrDuplicatedEntry("document number", "duplicate entry 00000000191")),
 			},
 			args: args{
 				documentNumber: "00000000191",
@@ -45,7 +45,7 @@ func TestCreateAccount(t *testing.T) {
 		{
 			name: "account created successfully",
 			fields: fields{
-				repo: domain.NewAccountMock(domain.NewID(1000), nil),
+				repo: domain.NewAccountMock(domain.NewID(1000), nil, nil),
 			},
 			args: args{
 				documentNumber: "00000000191",

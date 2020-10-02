@@ -15,11 +15,11 @@ type createAccountResponse struct {
 	CreatedAt string                                `json:"created_at"`
 }
 
-func newCreateAccountResponse(ID uint64, documentNumber string, createdAt time.Time) createAccountResponse {
+func newAccountResponse(ID uint64, documentNumber string, createdAt time.Time) createAccountResponse {
 	return createAccountResponse{
 		ID:        ID,
 		Document:  createAccountResponseDocumentResponse{Number: documentNumber},
-		CreatedAt: createdAt.Format(time.RFC3339),
+		CreatedAt: createdAt.UTC().Format(time.RFC3339),
 	}
 }
 

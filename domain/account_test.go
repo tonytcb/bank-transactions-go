@@ -78,7 +78,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name: "store successful",
 			args: args{
-				repo: NewAccountMock(NewID(uint64(1)), nil),
+				repo: NewAccountMock(NewID(uint64(1)), nil, nil),
 			},
 			want: &Account{
 				id: NewID(uint64(1)),
@@ -88,7 +88,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name: "store error",
 			args: args{
-				repo: NewAccountMock(nil, errors.New("unknown repository error")),
+				repo: NewAccountMock(nil, nil, errors.New("unknown repository error")),
 			},
 			want:    nil,
 			wantErr: errors.New("unknown repository error"),

@@ -53,3 +53,21 @@ func (a *Account) ID() *ID {
 func (a *Account) CreatedAt() time.Time {
 	return a.createdAt
 }
+
+// WithID returns a new Account struct with the informed ID value
+func (a *Account) WithID(id *ID) *Account {
+	return &Account{
+		id:        id,
+		document:  a.Document(),
+		createdAt: a.CreatedAt(),
+	}
+}
+
+// WithCreateAt returns a new Account struct with the informed createAt value
+func (a *Account) WithCreateAt(t time.Time) *Account {
+	return &Account{
+		id:        a.ID(),
+		document:  a.Document(),
+		createdAt: t,
+	}
+}

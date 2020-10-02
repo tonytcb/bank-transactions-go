@@ -3,10 +3,12 @@ package handler
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"testing"
 
 	"github.com/tonytcb/bank-transactions-go/domain"
@@ -17,6 +19,8 @@ func TestCreateAccount_Handler(t *testing.T) {
 	var logger = log.New(fakeWriter{}, "", log.LstdFlags)
 
 	accountOK, _ := domain.NewAccount("00000000191")
+
+	datetimeRegex := `[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z`
 
 	type fields struct {
 		accountCreator AccountCreator
@@ -40,7 +44,7 @@ func TestCreateAccount_Handler(t *testing.T) {
 			args: args{
 				payload: bytes.NewReader([]byte("")),
 			},
-			wantPayloadResponse: `{"errors":[{"field":"root","description":"payload must be a valid JSON"}]}`,
+			wantPayloadResponse: `{"errors":\[{"field":"root","description":"payload must be a valid JSON"}\]}`,
 			wantHTTPStatusCode:  http.StatusBadRequest,
 		},
 		{
@@ -51,7 +55,7 @@ func TestCreateAccount_Handler(t *testing.T) {
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "000"} }`)),
 			},
-			wantPayloadResponse: `{"errors":[{"field":"document.number","description":"number must be 11 characters in length"}]}`,
+			wantPayloadResponse: `{"errors":\[{"field":"document.number","description":"number must be 11 characters in length"}\]}`,
 			wantHTTPStatusCode:  http.StatusBadRequest,
 		},
 		{
@@ -79,23 +83,23 @@ func TestCreateAccount_Handler(t *testing.T) {
 		{
 			name: "unprocessable entity when the document number is invalid",
 			fields: fields{
-				accountCreator: newFakeAccountCreator(nil, domain.NewErrDomain("document.number", "invalid CPF")),
+				accountCreator: newFakeAccountCreator(nil, domain.NewErrDomain("document.number", "'00000000199' is not a valid CPF")),
 			},
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "00000000199"} }`)),
 			},
-			wantPayloadResponse: `{"errors":[{"field":"document.number","description":"document.number '\w+' is not a valid CPF"}]}`,
+			wantPayloadResponse: `{"errors":\[{"field":"document.number","description":"document.number '00000000199' is not a valid CPF"}\]}`,
 			wantHTTPStatusCode:  http.StatusUnprocessableEntity,
 		},
 		{
-			name: "unprocessable entity when the document number is invalid",
+			name: "unprocessable entity when the document number is already in storage",
 			fields: fields{
-				accountCreator: newFakeAccountCreator(nil, repository.NewErrDuplicatedEntry("document-number", "duplicate entry")),
+				accountCreator: newFakeAccountCreator(nil, repository.NewErrDuplicatedEntry("document_number", "00000000191")),
 			},
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "00000000191"} }`)),
 			},
-			wantPayloadResponse: `{"errors":[{"field":"document.number","description":"duplicate entry '\w+' for field 'document_number'}]}`,
+			wantPayloadResponse: `{"errors":\[{"field":"document_number","description":"duplicate entry '00000000191' for field 'document_number'"}\]}`,
 			wantHTTPStatusCode:  http.StatusConflict,
 		},
 
@@ -108,7 +112,7 @@ func TestCreateAccount_Handler(t *testing.T) {
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "00000000191"} }`)),
 			},
-			wantPayloadResponse: `{"id":\d+,"document":{"number":"00000000191"},"created_at":"\w+"}`,
+			wantPayloadResponse: fmt.Sprintf(`{"id":[0-9]+,"document":{"number":"00000000191"},"created_at":"%s"}`, datetimeRegex),
 			wantHTTPStatusCode:  http.StatusCreated,
 		},
 		{
@@ -119,7 +123,7 @@ func TestCreateAccount_Handler(t *testing.T) {
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "000.000.001-91"} }`)),
 			},
-			wantPayloadResponse: `{"id":\d+,"document":{"number":"00000000191"},"created_at":"\w+"}`,
+			wantPayloadResponse: fmt.Sprintf(`{"id":[0-9]+,"document":{"number":"00000000191"},"created_at":"%s"}`, datetimeRegex),
 			wantHTTPStatusCode:  http.StatusCreated,
 		},
 	}
@@ -130,14 +134,14 @@ func TestCreateAccount_Handler(t *testing.T) {
 			httpHandler := http.HandlerFunc(NewCreateAccount(logger, tt.fields.accountCreator).Handler)
 			req, err := http.NewRequest("POST", "/accounts", tt.args.payload)
 			if err != nil {
-				t.Error("error to create POST /accounts request")
+				t.Error("error to perform POST /accounts request")
 			}
 
 			httpHandler.ServeHTTP(rr, req)
 
 			var (
 				gotHTTPStatusCode = rr.Code
-				//gotPayload        = rr.Body.String()
+				gotPayload        = rr.Body.String()
 			)
 
 			if gotHTTPStatusCode != tt.wantHTTPStatusCode {
@@ -145,7 +149,15 @@ func TestCreateAccount_Handler(t *testing.T) {
 				return
 			}
 
-			// todo assert the response payload
+			match, err := regexp.MatchString(tt.wantPayloadResponse, gotPayload)
+			if err != nil {
+				t.Error("Error to validate payload using regex")
+			}
+
+			if !match {
+				t.Errorf("Payload Response is different from expected, got = %v, want %v", gotPayload, tt.wantPayloadResponse)
+				return
+			}
 		})
 	}
 }

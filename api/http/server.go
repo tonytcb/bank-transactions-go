@@ -29,17 +29,16 @@ func (s Server) Listen() {
 
 	e := echo.New()
 
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: s.logger.Writer()}))
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: s.logger.Writer()})) // todo improve the logger middleware
 	e.Use(middleware.Recover())
 
 	e.POST("/accounts", s.createAccountHandler())
+	e.GET("/accounts/:id", s.findAccountByIDHandler())
 
 	s.logger.Fatalln(e.Start(":8080"))
 }
 
 func (s Server) createAccountHandler() echo.HandlerFunc {
-	// @todo translate the standard response to use echo responder
-
 	accountRepo := repository.NewAccount(s.storage)
 
 	return func(ctx echo.Context) error {
@@ -48,6 +47,20 @@ func (s Server) createAccountHandler() echo.HandlerFunc {
 			usecase.NewCreateAccount(accountRepo),
 		)
 		createAccount.Handler(ctx.Response().Writer, ctx.Request())
+
+		return nil
+	}
+}
+
+func (s Server) findAccountByIDHandler() echo.HandlerFunc {
+	accountRepo := repository.NewAccount(s.storage)
+
+	return func(ctx echo.Context) error {
+		findAccount := handler.NewFindAccount(
+			s.logger,
+			usecase.NewFindAccount(accountRepo),
+		)
+		findAccount.Handler(ctx.Response().Writer, ctx.Request())
 
 		return nil
 	}

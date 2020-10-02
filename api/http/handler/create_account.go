@@ -77,7 +77,7 @@ func (h CreateAccount) Handler(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response := newCreateAccountResponse(
+	response := newAccountResponse(
 		account.ID().Value(),
 		account.Document().Number().String(),
 		account.CreatedAt(),
