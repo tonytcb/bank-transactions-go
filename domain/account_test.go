@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestNewAccount(t *testing.T) {
@@ -115,6 +116,100 @@ func TestAccount_Store(t *testing.T) {
 
 			if got.CreatedAt().Year() == 1 { // represents a not defined date
 				t.Errorf("Invalid createdAt value: %v", got.CreatedAt().String())
+			}
+		})
+	}
+}
+
+func TestAccount_WithID(t *testing.T) {
+	type args struct {
+		id *ID
+	}
+	tests := []struct {
+		name string
+		args args
+		want *ID
+	}{
+		{
+			name: "set id 100 successfully",
+			args: args{
+				id: NewID(100),
+			},
+			want: NewID(100),
+		},
+		{
+			name: "set id 1 successfully",
+			args: args{
+				id: NewID(1),
+			},
+			want: NewID(1),
+		},
+	}
+
+	for _, tt := range tests {
+		a := &Account{
+			id:       NewID(1),
+			document: &Document{number: "00000000191"},
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			got := a.WithID(tt.args.id)
+
+			if a == got {
+				t.Error("WithID() should return a new Account struct to assure immutability")
+			}
+
+			if got.ID().Value() != tt.want.Value() {
+				t.Errorf("ID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAccount_WithCreateAt(t *testing.T) {
+	var (
+		yesterday = time.Now().Add(-24 * time.Hour)
+		tomorrow  = time.Now().Add(24 * time.Hour)
+	)
+
+	type args struct {
+		createdAt time.Time
+	}
+	tests := []struct {
+		name string
+		args args
+		want time.Time
+	}{
+		{
+			name: "set yesterday as createdAt",
+			args: args{
+				createdAt: yesterday,
+			},
+			want: yesterday,
+		},
+		{
+			name: "set tomorrow as createdAt",
+			args: args{
+				createdAt: tomorrow,
+			},
+			want: tomorrow,
+		},
+	}
+
+	for _, tt := range tests {
+		a := &Account{
+			createdAt: time.Now(),
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			got := a.WithCreateAt(tt.args.createdAt)
+
+			if a == got {
+				t.Error("WithCreateAt() should return a new Account struct to assure immutability")
+			}
+
+			if got.CreatedAt().String() != tt.want.String() {
+				t.Errorf("CreatedAt() = %v, want %v", got, tt.want)
 			}
 		})
 	}

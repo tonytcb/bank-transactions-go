@@ -74,6 +74,14 @@ func TestNewDocument(t *testing.T) {
 				return
 			}
 
+			if err != nil {
+				return
+			}
+
+			if got.Number().String() != tt.want.Number().String() {
+				t.Errorf("NewDocument() got Number = %v, want %v", got.Number().String(), tt.want.Number().String())
+			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewDocument() got = %v, want %v", got, tt.want)
 			}

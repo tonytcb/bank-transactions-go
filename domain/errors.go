@@ -20,5 +20,5 @@ func NewErrDomain(field string, description string) *ErrDomain {
 }
 
 func (e ErrDomain) Error() string {
-	return fmt.Sprintf("%s %s", e.field, e.description)
+	return fmt.Sprintf("%s %s", e.Field(), e.Description())
 }
