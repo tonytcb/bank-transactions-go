@@ -20,7 +20,7 @@ test:
 # Example1: make test-cov-html PACKAGE=domain
 # Example2: make test-cov-html PACKAGE=usecase
 test-cov-html:
-	$(DOCKER_COMPOSE_EXEC) 'go test -coverprofile cover.out -v ./$(PACKAGE) && \
+	$(DOCKER_COMPOSE_EXEC) 'go test -coverprofile cover.out ./$(PACKAGE) && \
 	go tool cover -html=cover.out -o cover.html' && \
 	xdg-open ./cover.html
 

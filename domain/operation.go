@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"strconv"
+	"fmt"
 	"strings"
 )
 
@@ -38,14 +38,27 @@ func (o Operation) IsIncoming() bool {
 	return false
 }
 
+// ID returns the id value
+func (o Operation) ID() *ID {
+	return o.id
+}
+
+// Description returns the description value
+func (o Operation) Description() string {
+	return o.description
+}
+
 func newOperation(id uint64, description string) *Operation {
 	return &Operation{id: NewID(id), description: strings.ToUpper(description)}
 }
 
+// NewOperation creates a valid Operation struct
 func NewOperation(id *ID) (*Operation, error) {
 	if v, ok := operations[id.Value()]; ok {
 		return v, nil
 	}
 
-	return nil, NewErrDomain("operation", strconv.FormatUint(id.Value(), 10))
+	description := fmt.Sprintf("'%d' is not a valid operation id", id.Value())
+
+	return nil, NewErrDomain("operation", description)
 }

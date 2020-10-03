@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"strconv"
 	"time"
 )
 
@@ -18,7 +17,7 @@ type Transaction struct {
 func NewTransaction(accountID *ID, operationID *ID, amount float64) (*Transaction, error) {
 	operation, err := NewOperation(operationID)
 	if err != nil {
-		return nil, NewErrDomain("operation", strconv.FormatUint(operationID.Value(), 10))
+		return nil, err
 	}
 
 	account := &Account{id: accountID}
@@ -35,27 +34,53 @@ func NewTransaction(accountID *ID, operationID *ID, amount float64) (*Transactio
 	}, nil
 }
 
+func (t *Transaction) Store(repo TransactionRepository) (*Transaction, error) {
+	id, err := repo.Store(t)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Transaction{
+		id:        id,
+		account:   t.Account(),
+		operation: t.Operation(),
+		amount:    t.Amount(),
+		createdAt: time.Now(),
+	}, nil
+}
+
 // ID returns the transaction's id
-func (t Transaction) ID() *ID {
+func (t *Transaction) ID() *ID {
 	return t.id
 }
 
 // Account returns the account used to register the transaction
-func (t Transaction) Account() *Account {
+func (t *Transaction) Account() *Account {
 	return t.account
 }
 
 // Operation returns the type of then operation of the transaction
-func (t Transaction) Operation() *Operation {
+func (t *Transaction) Operation() *Operation {
 	return t.operation
 }
 
 // Amount returns the amount
-func (t Transaction) Amount() float64 {
+func (t *Transaction) Amount() float64 {
 	return t.amount
 }
 
 // CreatedAt returns the createdAt value
-func (t Transaction) CreatedAt() time.Time {
+func (t *Transaction) CreatedAt() time.Time {
 	return t.createdAt
+}
+
+// WithAccount returns a new Transaction struct with the informed account
+func (t *Transaction) WithAccount(a *Account) *Transaction {
+	return &Transaction{
+		account:   a,
+		id:        t.ID(),
+		operation: t.Operation(),
+		amount:    t.Amount(),
+		createdAt: t.CreatedAt(),
+	}
 }

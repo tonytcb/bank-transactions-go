@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -27,7 +28,7 @@ func TestNewTransaction(t *testing.T) {
 				amount:      201,
 			},
 			want:    nil,
-			wantErr: NewErrDomain("operation", "0"),
+			wantErr: NewErrDomain("operation", "'0' is not a valid operation id"),
 		},
 		{
 			name: "returns error when the operation 10 is invalid",
@@ -37,7 +38,7 @@ func TestNewTransaction(t *testing.T) {
 				amount:      201,
 			},
 			want:    nil,
-			wantErr: NewErrDomain("operation", "10"),
+			wantErr: NewErrDomain("operation", "'10' is not a valid operation id"),
 		},
 
 		// successes
@@ -142,6 +143,99 @@ func TestNewTransaction(t *testing.T) {
 
 			if !reflect.DeepEqual(got.ID(), tt.want.ID()) {
 				t.Errorf("NewTransaction() ID got = %v, want %v", got.ID(), tt.want.ID())
+			}
+		})
+	}
+}
+
+func TestTransaction_Store(t *testing.T) {
+	transaction, _ := NewTransaction(NewID(uint64(1)), NewID(uint64(1)), 100)
+
+	type args struct {
+		repo TransactionRepository
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Transaction
+		wantErr error
+	}{
+		{
+			name: "transaction stored successfully",
+			args: args{
+				repo: NewTransactionRepositoryMock(NewID(uint64(1000)), nil),
+			},
+			want:    &Transaction{id: NewID(uint64(1000))},
+			wantErr: nil,
+		},
+		{
+			name: "error when the repository returns an unknown error",
+			args: args{
+				repo: NewTransactionRepositoryMock(nil, errors.New("unknown repository error")),
+			},
+			want:    nil,
+			wantErr: errors.New("unknown repository error"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := transaction.Store(tt.args.repo)
+
+			if (err != nil) && !reflect.DeepEqual(err, tt.wantErr) {
+				t.Errorf("Store() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if err != nil {
+				return
+			}
+
+			if got.ID().Value() <= 0 {
+				t.Errorf("Invalid Account ID: it must be greater than zero")
+				return
+			}
+
+			if got.CreatedAt().Year() == 1 { // represents a not defined date
+				t.Errorf("Invalid createdAt value: %v", got.CreatedAt().String())
+			}
+		})
+	}
+}
+
+func TestTransaction_WithAccount(t1 *testing.T) {
+	type args struct {
+		a *Account
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Transaction
+	}{
+		{
+			name: "set account 1",
+			args: args{a: &Account{id: NewID(uint64(1))}},
+			want: &Transaction{id: NewID(uint64(10))},
+		},
+		{
+			name: "set account 100",
+			args: args{a: &Account{id: NewID(uint64(100))}},
+			want: &Transaction{id: NewID(uint64(10))},
+		},
+	}
+
+	for _, tt := range tests {
+		transaction := &Transaction{}
+
+		t1.Run(tt.name, func(t1 *testing.T) {
+			got := transaction.WithAccount(tt.args.a)
+
+			if transaction == got {
+				t1.Error("WithAccount() should return a new Account struct to assure immutability")
+			}
+
+			if got.Account().ID().Value() != tt.args.a.ID().Value() {
+				t1.Errorf("Account().ID = %v, want %v", got.Account().ID(), tt.args.a.ID())
 			}
 		})
 	}

@@ -22,14 +22,14 @@ func TestOperation(t *testing.T) {
 			fields: fields{
 				id: NewID(10),
 			},
-			wantErr: NewErrDomain("operation", "10"),
+			wantErr: NewErrDomain("operation", "'10' is not a valid operation id"),
 		},
 		{
 			name: "invalid operation",
 			fields: fields{
 				id: NewID(100),
 			},
-			wantErr: NewErrDomain("operation", "100"),
+			wantErr: NewErrDomain("operation", "'100' is not a valid operation id"),
 		},
 
 		// success
@@ -91,6 +91,14 @@ func TestOperation(t *testing.T) {
 
 			if got := o.IsIncoming(); got != tt.wantIsIncoming {
 				t.Errorf("IsIncoming() = %v, want %v", got, tt.wantIsIncoming)
+			}
+
+			if o.ID().Value() != tt.fields.id.Value() {
+				t.Errorf("Invalid ID")
+			}
+
+			if o.Description() != (operations[o.ID().Value()]).Description() {
+				t.Errorf("Invalid Description")
 			}
 		})
 	}

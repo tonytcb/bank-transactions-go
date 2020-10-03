@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/tonytcb/bank-transactions-go/domain"
 	"github.com/tonytcb/bank-transactions-go/infra/repository"
@@ -107,23 +108,23 @@ func TestCreateAccount_Handler(t *testing.T) {
 		{
 			name: "account created successfully",
 			fields: fields{
-				accountCreator: newFakeAccountCreator(accountOK, nil),
+				accountCreator: newFakeAccountCreator(accountOK.WithID(domain.NewID(100)).WithCreateAt(time.Now()), nil),
 			},
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "00000000191"} }`)),
 			},
-			wantPayloadResponse: fmt.Sprintf(`{"id":[0-9]+,"document":{"number":"00000000191"},"created_at":"%s"}`, datetimeRegex),
+			wantPayloadResponse: fmt.Sprintf(`{"id":100,"document":{"number":"00000000191"},"created_at":"%s"}`, datetimeRegex),
 			wantHTTPStatusCode:  http.StatusCreated,
 		},
 		{
 			name: "account created successfully with a formatted document number",
 			fields: fields{
-				accountCreator: newFakeAccountCreator(accountOK, nil),
+				accountCreator: newFakeAccountCreator(accountOK.WithID(domain.NewID(200)).WithCreateAt(time.Now()), nil),
 			},
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "000.000.001-91"} }`)),
 			},
-			wantPayloadResponse: fmt.Sprintf(`{"id":[0-9]+,"document":{"number":"00000000191"},"created_at":"%s"}`, datetimeRegex),
+			wantPayloadResponse: fmt.Sprintf(`{"id":200,"document":{"number":"00000000191"},"created_at":"%s"}`, datetimeRegex),
 			wantHTTPStatusCode:  http.StatusCreated,
 		},
 	}

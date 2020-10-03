@@ -5,25 +5,30 @@ import (
 	"time"
 )
 
-type createAccountResponseDocumentResponse struct {
-	Number string `json:"number"`
+type documentResponse struct {
+	Number string `json:"number,omitempty"`
 }
 
-type createAccountResponse struct {
-	ID        uint64                                `json:"id"`
-	Document  createAccountResponseDocumentResponse `json:"document"`
-	CreatedAt string                                `json:"created_at"`
+type accountResponse struct {
+	ID        uint64           `json:"id,omitempty"`
+	Document  documentResponse `json:"document,omitempty"`
+	CreatedAt string           `json:"created_at,omitempty"`
 }
 
-func newAccountResponse(ID uint64, documentNumber string, createdAt time.Time) createAccountResponse {
-	return createAccountResponse{
+func newAccountResponse(ID uint64, documentNumber string, createdAt time.Time) accountResponse {
+	t := createdAt.UTC().Format(time.RFC3339)
+	if createdAt.Year() == 1 {
+		t = ""
+	}
+
+	return accountResponse{
 		ID:        ID,
-		Document:  createAccountResponseDocumentResponse{Number: documentNumber},
-		CreatedAt: createdAt.UTC().Format(time.RFC3339),
+		Document:  documentResponse{Number: documentNumber},
+		CreatedAt: t,
 	}
 }
 
-func (c createAccountResponse) Encode() []byte {
+func (c accountResponse) Encode() []byte {
 	res, _ := json.Marshal(c)
 
 	return res

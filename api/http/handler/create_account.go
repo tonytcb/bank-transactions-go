@@ -68,7 +68,7 @@ func (h CreateAccount) Handler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		if v, ok := err.(*domain.ErrDomain); ok {
-			h.translateDomainError(responder, v)
+			translateDomainError(responder, v)
 			return
 		}
 
@@ -91,7 +91,12 @@ func (h CreateAccount) translateDuplicateError(r *responder, err *repository.Err
 	r.conflict(errResponse.Encode())
 }
 
-func (h CreateAccount) translateDomainError(r *responder, err *domain.ErrDomain) {
+func translateDomainError(r *responder, err *domain.ErrDomain) {
 	errResponse := newErrorResponse(map[string]string{err.Field(): err.Error()})
+	r.unprocessableEntity(errResponse.Encode())
+}
+
+func translateForeignKeyError(r *responder, err *repository.ErrForeignKeyConstraint) {
+	errResponse := newErrorResponse(map[string]string{err.ForeignKey(): err.Error()})
 	r.unprocessableEntity(errResponse.Encode())
 }

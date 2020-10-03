@@ -6,14 +6,14 @@ type AccountRepository interface {
 	FindOneByID(*ID) (*Account, error)
 }
 
-// AccountMock represents a fake representation of an Account
+// AccountMock is a fake representation of an AccountRepository, useful to create unit tests
 type AccountMock struct {
 	id      *ID
 	account *Account
 	err     error
 }
 
-// NewAccount build a new AccountMock struct with its mock results
+// NewAccount builds a new AccountMock struct with its mock results
 func NewAccountMock(id *ID, acc *Account, err error) *AccountMock {
 	return &AccountMock{id: id, account: acc, err: err}
 }
