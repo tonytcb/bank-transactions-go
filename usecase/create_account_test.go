@@ -33,7 +33,7 @@ func TestCreateAccount(t *testing.T) {
 			wantErr: domain.NewErrDomain("document.number", "'00000000000' is not a valid CPF"),
 		},
 		{
-			name: "domain error when the document numbers is duplicate",
+			name: "repository error when the document numbers is duplicate",
 			fields: fields{
 				repo: domain.NewAccountMock(nil, nil, repository.NewErrDuplicatedEntry("document number", "duplicate entry 00000000191")),
 			},

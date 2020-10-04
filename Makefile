@@ -2,6 +2,9 @@
 
 DOCKER_COMPOSE_EXEC:= docker exec bank-transaction-app bash -c
 
+init:
+	cp .env.example .env
+
 up:
 	docker-compose up &
 
@@ -18,7 +21,7 @@ test:
 	$(DOCKER_COMPOSE_EXEC) 'go test -race -cover ./...'
 
 # Example1: make test-cov-html PACKAGE=domain
-# Example2: make test-cov-html PACKAGE=usecase
+# Example2: make test-cov-html PACKAGE=api/http/handler
 test-cov-html:
 	$(DOCKER_COMPOSE_EXEC) 'go test -coverprofile cover.out ./$(PACKAGE) && \
 	go tool cover -html=cover.out -o cover.html' && \

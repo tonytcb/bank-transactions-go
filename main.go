@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	// todo improve the logger struct with common methods (INFO, WARN, ERROR, ...) and a way to track logs over the same process
+
 	var logger = log.New(os.Stdout, "", log.LstdFlags|log.Lmicroseconds)
 
 	logger.Println("starting app")

@@ -84,3 +84,14 @@ func (t *Transaction) WithAccount(a *Account) *Transaction {
 		createdAt: t.CreatedAt(),
 	}
 }
+
+// WithAccount returns a new Transaction struct with the informed account
+func (t *Transaction) WithID(id *ID) *Transaction {
+	return &Transaction{
+		id:        id,
+		account:   t.Account(),
+		operation: t.Operation(),
+		amount:    t.Amount(),
+		createdAt: t.CreatedAt(),
+	}
+}

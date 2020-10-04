@@ -28,7 +28,7 @@ func NewAccount(documentNumber DocumentNumber) (*Account, error) {
 func (a *Account) Store(repo AccountRepository) (*Account, error) {
 	id, err := repo.Store(a)
 	if err != nil {
-		// todo add context to the error returned
+		// todo add context to the error
 		return nil, err
 	}
 

@@ -24,7 +24,6 @@ func (c CreateAccount) Create(documentNumber string) (*domain.Account, error) {
 
 	acc, err := account.Store(c.repo)
 	if err != nil {
-		// todo add context to the error
 		return nil, err
 	}
 

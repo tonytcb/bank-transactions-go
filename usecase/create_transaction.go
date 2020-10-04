@@ -24,7 +24,6 @@ func (c CreateTransaction) Create(accountID, operationID *domain.ID, amount floa
 
 	t, err := transaction.Store(c.repo)
 	if err != nil {
-		// todo add context to the error
 		return nil, err
 	}
 

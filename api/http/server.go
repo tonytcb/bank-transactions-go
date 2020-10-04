@@ -34,6 +34,8 @@ func (s Server) Listen() {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: s.logger.Writer()}))
 	e.Use(middleware.Recover())
 
+	// todo use separate storages to write and read operations
+
 	e.POST("/accounts", s.createAccountHandler())
 	e.GET("/accounts/:id", s.findAccountByIDHandler())
 	e.POST("/transactions", s.createTransactionHandler())

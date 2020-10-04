@@ -150,11 +150,7 @@ func TestCreateAccount_Handler(t *testing.T) {
 				return
 			}
 
-			match, err := regexp.MatchString(tt.wantPayloadResponse, gotPayload)
-			if err != nil {
-				t.Error("Error to validate payload using regex")
-			}
-
+			match := regexp.MustCompile(tt.wantPayloadResponse).MatchString(gotPayload)
 			if !match {
 				t.Errorf("Payload Response is different from expected, got = %v, want %v", gotPayload, tt.wantPayloadResponse)
 				return

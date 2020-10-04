@@ -16,7 +16,7 @@ type TransactionCreator interface {
 	Create(*domain.ID, *domain.ID, float64) (*domain.Transaction, error)
 }
 
-// CreateTransaction contains the dependencies to create an transaction
+// CreateTransaction contains the dependencies to create a transaction
 type CreateTransaction struct {
 	logger             *log.Logger
 	transactionCreator TransactionCreator
