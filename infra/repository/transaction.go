@@ -33,7 +33,7 @@ func (t Transaction) Store(transaction *domain.Transaction) (*domain.ID, error) 
 	result, err := stmt.Exec(transaction.Account().ID().Value(), transaction.Operation().ID().Value(), transaction.Amount())
 	if err != nil {
 		if v, ok := err.(*mysql.MySQLError); ok {
-			return nil, translateMySqlErrors(v)
+			return nil, translateMySQLErrors(v)
 		}
 
 		return nil, errors.Wrap(err, "unknown database error")

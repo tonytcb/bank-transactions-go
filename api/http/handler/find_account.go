@@ -17,7 +17,7 @@ type AccountFinder interface {
 	Find(*domain.ID) (*domain.Account, error)
 }
 
-// CreateAccount contains the dependencies to find an account
+// FindAccount contains the dependencies to find an account
 type FindAccount struct {
 	logger        *log.Logger
 	accountFinder AccountFinder

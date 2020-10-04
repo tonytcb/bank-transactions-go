@@ -35,7 +35,7 @@ func (a Account) Store(acc *domain.Account) (*domain.ID, error) {
 	result, err := stmt.Exec(acc.Document().Number().String())
 	if err != nil {
 		if v, ok := err.(*mysql.MySQLError); ok {
-			return nil, translateMySqlErrors(v)
+			return nil, translateMySQLErrors(v)
 		}
 
 		return nil, errors.Wrap(err, "database error")

@@ -13,7 +13,7 @@ type AccountMock struct {
 	err     error
 }
 
-// NewAccount builds a new AccountMock struct with its mock results
+// NewAccountMock builds a new AccountMock struct with its mock results
 func NewAccountMock(id *ID, acc *Account, err error) *AccountMock {
 	return &AccountMock{id: id, account: acc, err: err}
 }

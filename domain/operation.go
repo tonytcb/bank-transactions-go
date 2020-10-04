@@ -6,10 +6,17 @@ import (
 )
 
 var (
-	OperationCompraAVista    = newOperation(uint64(1), "compra a vista")
+	// OperationCompraAVista representa uma operação de compra a vista
+	OperationCompraAVista = newOperation(uint64(1), "compra a vista")
+
+	// OperationCompraParcelada representa uma operação de compra parcelada
 	OperationCompraParcelada = newOperation(uint64(2), "compra parcelada")
-	OperationSaque           = newOperation(uint64(3), "saque")
-	OperationPagamento       = newOperation(uint64(4), "Pagamento")
+
+	// OperationSaque representa uma operação de saque
+	OperationSaque = newOperation(uint64(3), "saque")
+
+	// OperationPagamento representa uma operação de pagamento
+	OperationPagamento = newOperation(uint64(4), "Pagamento")
 
 	operations = map[uint64]*Operation{
 		OperationCompraAVista.id.Value():    OperationCompraAVista,

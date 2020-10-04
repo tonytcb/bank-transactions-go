@@ -24,7 +24,7 @@ func (e ErrDuplicateEntry) Error() string {
 	return fmt.Sprintf(`duplicate entry '%s' for field '%s'`, e.Value(), e.Field())
 }
 
-// Field returns the duplicate value
+// Value returns the duplicate value
 func (e ErrDuplicateEntry) Value() string {
 	return e.value
 }
@@ -52,7 +52,7 @@ func (e ErrRegisterNotFound) Field() string {
 	return e.field
 }
 
-// Field returns the duplicate value
+// Value returns the duplicate value
 func (e ErrRegisterNotFound) Value() string {
 	return e.value
 }
@@ -64,7 +64,7 @@ func (e ErrRegisterNotFound) Error() string {
 
 // --
 
-// ErrRegisterNotFound represents an error when occurred an error to load data
+// ErrLoadInvalidData represents an error when occurred an error to load data
 type ErrLoadInvalidData struct {
 	field string
 }
@@ -81,6 +81,7 @@ func (e ErrLoadInvalidData) Error() string {
 
 // --
 
+// ErrForeignKeyConstraint represents an foreign key error occurred in the storage
 type ErrForeignKeyConstraint struct {
 	table      string
 	constraint string
@@ -88,10 +89,12 @@ type ErrForeignKeyConstraint struct {
 	references string
 }
 
+// ForeignKey returns the foreign key value
 func (e ErrForeignKeyConstraint) ForeignKey() string {
 	return e.foreignKey
 }
 
+// NewErrForeignKeyConstraint builds a ErrForeignKeyConstraint struct
 func NewErrForeignKeyConstraint(table string, constraint string, foreignKey string, references string) *ErrForeignKeyConstraint {
 	return &ErrForeignKeyConstraint{table: table, constraint: constraint, foreignKey: foreignKey, references: references}
 }
@@ -103,7 +106,7 @@ func (e ErrForeignKeyConstraint) Error() string {
 
 // --
 
-func translateMySqlErrors(err *mysql.MySQLError) error {
+func translateMySQLErrors(err *mysql.MySQLError) error {
 	const (
 		duplicateEntryErrorCode       = 1062
 		foreignKeyConstraintErrorCode = 1452

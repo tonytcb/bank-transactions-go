@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // Register MySQL operations
 	"github.com/pkg/errors"
 )
 
-// NewMySQL creates a new mysql connection
+// NewMySQLConnection creates a new mysql connection
 func NewMySQLConnection(c Config) (*sql.DB, error) {
 	db, err := sql.Open(c.host, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.user, c.password, c.host, c.port, c.database))
 	if err != nil {

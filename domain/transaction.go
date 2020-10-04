@@ -34,6 +34,7 @@ func NewTransaction(accountID *ID, operationID *ID, amount float64) (*Transactio
 	}, nil
 }
 
+// Store stores a transaction given a repository
 func (t *Transaction) Store(repo TransactionRepository) (*Transaction, error) {
 	id, err := repo.Store(t)
 	if err != nil {
@@ -85,7 +86,7 @@ func (t *Transaction) WithAccount(a *Account) *Transaction {
 	}
 }
 
-// WithAccount returns a new Transaction struct with the informed account
+// WithID returns a new Transaction struct with the informed account
 func (t *Transaction) WithID(id *ID) *Transaction {
 	return &Transaction{
 		id:        id,
