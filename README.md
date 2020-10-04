@@ -1,15 +1,17 @@
 # bank-transactions-go
-Bank Transactions é uma aplicação escrita em Go que simula transações bancárias básicas, como: compra, saque e pagamento. Tais serviços são expostos como uma API REST.
+Bank Transactions é uma aplicação escrita em Go que simula transações bancárias básicas, como: compra, saque e pagamento.
 
-A aplicação faz uso dos conceitos de "Clean Architecture", criada originalmente por Robert C. Martin, onde é de fácil leitura, independente de agentes externos  e altamente testável.
+Tais serviços são expostos em uma API REST.
+
+A aplicação possui uma arquitetura baseada nos conceitos de **Clean Architecture**, descrita originalmente por Robert C. Martin, tornando o código de fácil leitura, independente de agentes externos, altamente testável e de fácil manutenção. Clique [aqui](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) para ver mais detalhes no **blog do Uncle Bob**.
 
 ## Dependências
-Para facilitar a execução bem como evitar problemas em diferentes ambientes, a aplicação é containerizada usando **Docker**. E, para facilitar a manipulação dos containers, usa-se **Docker-Compose**. Logo, estas duas ferramentas são obrigatórias para executar este projeto facilmente.
+Para facilitar a execução bem como evitar problemas em diferentes ambientes, a aplicação é containerizada usando **Docker**. E, para facilitar a manipulação dos containers, usa-se **Docker-Compose**. Logo, estas duas ferramentas são pré-requisitos para executar este projeto com mais facilidade.
 
-Por questões de segurança, nenhuma credencial está exposta nesse repositório, mas a aplicação depende que estas credenciais estejam definidas em variáveis de ambiente. Estas credenciais serão automaticamente lidas pelo container Docker do arquivo **.env** na raíz do projeto. O  arquivo **.env.example** contém todas as variáveis necessárias e valores pré-definidos para ambiente de desenvolvimento local. O comando **make init** criará o arquivo .env com base no exemplo e a aplicação estará pronta para iniciar.
+Por questões de segurança, nenhuma credencial de servidores está exposta nesse repositório, porém, a aplicação depende que estas credenciais estejam definidas em variáveis de ambiente. Estas credenciais serão automaticamente lidas pelo container Docker do arquivo **.env** na raíz do projeto. Tais credenciais estão disponíveis no  arquivo **.env.example**, com valores pré-definidos para o ambiente de desenvolvimento local. O comando **make init** criará o arquivo .env com base no exemplo e a aplicação estará pronta para iniciar.
 
 ## Como Iniciar
-Após executar **make init** para definir as variáveis de ambiente, deve-se executar o comando **make up** que fará o download de todas as dependências da aplicação e iniciará os containeres necessários para executar todos os casos de uso.  
+Após executar **make init** para definir as variáveis de ambiente, deve-se executar o comando **make up**, que fará o download de todas as dependências da aplicação e iniciará os containeres necessários para executar todos os casos de uso.  
 
 ## API REST
 A API HTTP está exposta através da porta 8080.
@@ -28,17 +30,21 @@ Quando a solicitação não pode ser atendida, será retornado um *HTTP Status C
 
 ### Criar Conta
 
-Cada cliente possui uma conta disponibilizada pelo banco, e para criar a mesma, deve-se informar um CPF válido.
+Cada cliente possui uma conta disponibilizada pelo banco, e para criar a mesma, deve-se informar um CPF válido, formatado ou não.
 
 Endpoint: 
 ```
 POST /accounts
 ```
+Headers:
+```
+Content-type: application/json
+```
 Request Payload:
 ```
 {
     "document": {
-        "number": "000.000.001-91"
+        "number": "00000000191"
     }
 }
 ```
@@ -100,6 +106,10 @@ Caso a operação informada seja de compra (1, 2) ou saque (3), a transação se
 Endpoint: 
 ```
 POST /transactions
+```
+Headers:
+```
+Content-type: application/json
 ```
 Request Payload:
 ```
