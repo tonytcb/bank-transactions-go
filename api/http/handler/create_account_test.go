@@ -84,12 +84,12 @@ func TestCreateAccount_Handler(t *testing.T) {
 		{
 			name: "unprocessable entity when the document number is invalid",
 			fields: fields{
-				accountCreator: newFakeAccountCreator(nil, domain.NewErrDomain("document.number", "'00000000199' is not a valid CPF")),
+				accountCreator: newFakeAccountCreator(nil, domain.NewErrDomain("document.number", "'00000000199' is not a valid document number")),
 			},
 			args: args{
 				payload: bytes.NewReader([]byte(`{"document": {"number": "00000000199"} }`)),
 			},
-			wantPayloadResponse: `{"errors":\[{"field":"document.number","description":"document.number '00000000199' is not a valid CPF"}\]}`,
+			wantPayloadResponse: `{"errors":\[{"field":"document.number","description":"document.number '00000000199' is not a valid document number"}\]}`,
 			wantHTTPStatusCode:  http.StatusUnprocessableEntity,
 		},
 		{

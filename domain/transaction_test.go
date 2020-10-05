@@ -240,3 +240,41 @@ func TestTransaction_WithAccount(t1 *testing.T) {
 		})
 	}
 }
+
+func TestTransaction_WithID(t1 *testing.T) {
+	type args struct {
+		id *ID
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Transaction
+	}{
+		{
+			name: "set id 10",
+			args: args{id: NewID(uint64(10))},
+			want: &Transaction{id: NewID(uint64(10))},
+		},
+		{
+			name: "set id 999",
+			args: args{id: NewID(uint64(999))},
+			want: &Transaction{id: NewID(uint64(999))},
+		},
+	}
+
+	for _, tt := range tests {
+		transaction := &Transaction{}
+
+		t1.Run(tt.name, func(t1 *testing.T) {
+			got := transaction.WithID(tt.args.id)
+
+			if transaction == got {
+				t1.Error("WithID() should return a new Transaction struct to assure immutability")
+			}
+
+			if got.ID().Value() != tt.args.id.Value() {
+				t1.Errorf("ID = %v, want %v", got.ID().Value(), tt.args.id.Value())
+			}
+		})
+	}
+}

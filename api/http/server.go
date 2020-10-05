@@ -3,13 +3,14 @@ package http
 import (
 	"database/sql"
 	"log"
-
-	"github.com/tonytcb/bank-transactions-go/infra/repository"
-	"github.com/tonytcb/bank-transactions-go/usecase"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/tonytcb/bank-transactions-go/api/http/handler"
+	stdmiddleware "github.com/tonytcb/bank-transactions-go/api/http/middleware"
+	"github.com/tonytcb/bank-transactions-go/infra/repository"
+	"github.com/tonytcb/bank-transactions-go/usecase"
 )
 
 // Server exposes the app through the HTTP protocol
@@ -29,12 +30,9 @@ func (s Server) Listen() {
 
 	e := echo.New()
 
-	// todo improve the logger middleware
-
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: s.logger.Writer()}))
 	e.Use(middleware.Recover())
-
-	// todo use separate storages to write and read operations
+	e.Use(s.middleware(stdmiddleware.NewRequestID().Handler))
+	e.Use(s.middleware(stdmiddleware.NewLogger(s.logger).Handler))
 
 	e.POST("/accounts", s.createAccountHandler())
 	e.GET("/accounts/:id", s.findAccountByIDHandler())
@@ -44,43 +42,53 @@ func (s Server) Listen() {
 }
 
 func (s Server) createAccountHandler() echo.HandlerFunc {
-	accountRepo := repository.NewAccount(s.storage)
+	createAccount := handler.NewCreateAccount(
+		s.logger,
+		usecase.NewCreateAccount(repository.NewAccount(s.storage)),
+	)
 
-	return func(ctx echo.Context) error {
-		createAccount := handler.NewCreateAccount(
-			s.logger,
-			usecase.NewCreateAccount(accountRepo),
-		)
-		createAccount.Handler(ctx.Response().Writer, ctx.Request())
-
-		return nil
-	}
+	return s.handler(createAccount.Handler)
 }
 
 func (s Server) findAccountByIDHandler() echo.HandlerFunc {
-	accountRepo := repository.NewAccount(s.storage)
+	findAccount := handler.NewFindAccount(
+		s.logger,
+		usecase.NewFindAccount(repository.NewAccount(s.storage)),
+	)
 
+	return s.handler(findAccount.Handler)
+}
+
+func (s Server) createTransactionHandler() echo.HandlerFunc {
+	createTransaction := handler.NewCreateTransaction(
+		s.logger,
+		usecase.NewCreateTransaction(repository.NewTransaction(s.storage)),
+	)
+
+	return s.handler(createTransaction.Handler)
+}
+
+// handler translates a standard http handler to an echo handler
+func (s Server) handler(fn func(http.ResponseWriter, *http.Request)) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		findAccount := handler.NewFindAccount(
-			s.logger,
-			usecase.NewFindAccount(accountRepo),
-		)
-		findAccount.Handler(ctx.Response().Writer, ctx.Request())
+		fn(ctx.Response().Writer, ctx.Request())
 
 		return nil
 	}
 }
 
-func (s Server) createTransactionHandler() echo.HandlerFunc {
-	transactionRepo := repository.NewTransaction(s.storage)
+// middleware translates a standard http middleware to an echo middleware
+func (s Server) middleware(fn func(http.ResponseWriter, *http.Request, http.HandlerFunc)) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			var nextFn http.HandlerFunc = func(rw http.ResponseWriter, r *http.Request) {
+				// todo fix translation
+				next(ctx)
+			}
 
-	return func(ctx echo.Context) error {
-		createTransactionHandler := handler.NewCreateTransaction(
-			s.logger,
-			usecase.NewCreateTransaction(transactionRepo),
-		)
-		createTransactionHandler.Handler(ctx.Response().Writer, ctx.Request())
+			fn(ctx.Response().Writer, ctx.Request(), nextFn)
 
-		return nil
+			return nil
+		}
 	}
 }

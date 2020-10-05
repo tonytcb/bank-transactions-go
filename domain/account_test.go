@@ -22,7 +22,7 @@ func TestNewAccount(t *testing.T) {
 			name:    "invalid document number",
 			args:    args{documentNumber: "00000000000"},
 			want:    nil,
-			wantErr: NewErrDomain("document.number", "'00000000000' is not a valid CPF"),
+			wantErr: NewErrDomain("document.number", "'00000000000' is not a valid document number"),
 		},
 		{
 			name: "valid CPF document",

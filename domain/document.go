@@ -21,13 +21,11 @@ type Document struct {
 
 // NewDocument build a new Documents with its dependencies
 func NewDocument(number DocumentNumber) (*Document, error) {
-	// todo improve the document validation to be easier to add more documents types
-
-	if !brdoc.IsCPF(string(number)) {
-		return nil, NewErrDomain("document.number", fmt.Sprintf("'%s' is not a valid CPF", number))
+	if brdoc.IsCPF(string(number)) {
+		return &Document{number: number}, nil
 	}
 
-	return &Document{number: number}, nil
+	return nil, NewErrDomain("document.number", fmt.Sprintf("'%s' is not a valid document number", number))
 }
 
 // Number returns the value of document number
