@@ -1,7 +1,7 @@
 # bank-transactions-go
 Bank Transactions é uma aplicação escrita em Go que simula transações bancárias básicas, como: compra, saque e pagamento.
 
-Tais serviços são expostos em uma API REST.
+Tais serviços são expostos como uma API REST.
 
 A aplicação possui uma arquitetura baseada nos conceitos de **Clean Architecture**, descrita originalmente por Robert C. Martin, tornando o código de fácil leitura, independente de agentes externos, altamente testável e de fácil manutenção. Clique [aqui](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) para ver mais detalhes no **blog do Uncle Bob**.
 

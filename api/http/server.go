@@ -46,7 +46,7 @@ func (s Server) Listen() {
 func (s Server) createAccountHandler() echo.HandlerFunc {
 	createAccount := handler.NewCreateAccount(
 		s.logger,
-		usecase.NewCreateAccount(repository.NewAccount(s.storage)),
+		usecase.NewCreateAccount(repository.NewAccountWriter(s.storage)),
 	)
 
 	return s.handler(createAccount.Handler)
@@ -55,7 +55,7 @@ func (s Server) createAccountHandler() echo.HandlerFunc {
 func (s Server) findAccountByIDHandler() echo.HandlerFunc {
 	findAccount := handler.NewFindAccount(
 		s.logger,
-		usecase.NewFindAccount(repository.NewAccount(s.storage)),
+		usecase.NewFindAccount(repository.NewAccountReader(s.storage)),
 	)
 
 	return s.handler(findAccount.Handler)

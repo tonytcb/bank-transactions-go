@@ -5,52 +5,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
-	"github.com/pkg/errors"
 	"github.com/tonytcb/bank-transactions-go/domain"
 )
 
-// Account exposes account database operations
-type Account struct {
+// AccountReader exposes account read database operations
+type AccountReader struct {
 	conn *sql.DB
 }
 
-// NewAccount build a new Account struct with its dependencies
-func NewAccount(conn *sql.DB) *Account {
-	return &Account{conn: conn}
-}
-
-// Store stores an account in the storage
-func (a Account) Store(acc *domain.Account) (*domain.ID, error) {
-	var query = `
-		INSERT INTO accounts (document_number)
-		VALUES (?)
-	`
-
-	stmt, err := a.conn.Prepare(query)
-	if err != nil {
-		return nil, errors.Wrap(err, "prepare statement error")
-	}
-
-	result, err := stmt.Exec(acc.Document().Number().String())
-	if err != nil {
-		if v, ok := err.(*mysql.MySQLError); ok {
-			return nil, translateMySQLErrors(v)
-		}
-
-		return nil, errors.Wrap(err, "database error")
-	}
-
-	id, err := result.LastInsertId()
-	if err != nil {
-		return nil, errors.Wrap(err, "error to read the last inserted id")
-	}
-
-	return domain.NewID(uint64(id)), nil
+// NewAccountReader build a new AccountReader struct with its dependencies
+func NewAccountReader(conn *sql.DB) *AccountReader {
+	return &AccountReader{conn: conn}
 }
 
 // FindOneByID finds and return one account based in the informed ID
-func (a Account) FindOneByID(id *domain.ID) (*domain.Account, error) {
+func (a AccountReader) FindOneByID(id *domain.ID) (*domain.Account, error) {
 	var (
 		documentNumber     string
 		createdAtTimestamp []uint8

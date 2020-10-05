@@ -6,11 +6,11 @@ import (
 
 // FindAccount contains all the dependencies to find an account
 type FindAccount struct {
-	repo domain.AccountRepository
+	repo domain.AccountRepositoryReader
 }
 
 // NewFindAccount creates a new FindAccount with its dependencies
-func NewFindAccount(repo domain.AccountRepository) *FindAccount {
+func NewFindAccount(repo domain.AccountRepositoryReader) *FindAccount {
 	return &FindAccount{repo: repo}
 }
 

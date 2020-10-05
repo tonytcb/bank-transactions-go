@@ -1,25 +1,29 @@
 package domain
 
-// AccountRepository represents the behaviour of the Account Repository
-type AccountRepository interface {
+// AccountRepositoryWriter represents the behaviour of the Account Repository to write operation
+type AccountRepositoryWriter interface {
 	Store(*Account) (*ID, error)
+}
+
+// AccountRepositoryReader represents the behaviour of the Account Repository to read operation
+type AccountRepositoryReader interface {
 	FindOneByID(*ID) (*Account, error)
 }
 
-// AccountMock is a fake representation of an AccountRepository, useful to create unit tests
-type AccountMock struct {
+// AccountRepositoryMock is a fake representation of an AccountRepositoryWriter, useful to create unit tests
+type AccountRepositoryMock struct {
 	id      *ID
 	account *Account
 	err     error
 }
 
-// NewAccountMock builds a new AccountMock struct with its mock results
-func NewAccountMock(id *ID, acc *Account, err error) *AccountMock {
-	return &AccountMock{id: id, account: acc, err: err}
+// NewAccountRepositoryMock builds a new AccountRepositoryMock struct with its mock results
+func NewAccountRepositoryMock(id *ID, acc *Account, err error) *AccountRepositoryMock {
+	return &AccountRepositoryMock{id: id, account: acc, err: err}
 }
 
 // Store stores an account
-func (a AccountMock) Store(_ *Account) (*ID, error) {
+func (a AccountRepositoryMock) Store(_ *Account) (*ID, error) {
 	if a.err != nil {
 		return nil, a.err
 	}
@@ -28,7 +32,7 @@ func (a AccountMock) Store(_ *Account) (*ID, error) {
 }
 
 // FindOneByID finds an account by its id
-func (a AccountMock) FindOneByID(_ *ID) (*Account, error) {
+func (a AccountRepositoryMock) FindOneByID(_ *ID) (*Account, error) {
 	if a.err != nil {
 		return nil, a.err
 	}

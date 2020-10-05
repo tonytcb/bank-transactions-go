@@ -12,7 +12,7 @@ func TestCreateTransaction_Create(t *testing.T) {
 	transaction := &domain.Transaction{}
 
 	type fields struct {
-		repo domain.TransactionRepository
+		repo domain.TransactionRepositoryWriter
 	}
 	type args struct {
 		accountID   *domain.ID

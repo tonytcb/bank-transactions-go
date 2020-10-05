@@ -16,7 +16,7 @@ func TestFindAccount_Find(t *testing.T) {
 	accountOK = accountOK.WithID(domain.NewID(uint64(100))).WithCreateAt(time.Now())
 
 	type fields struct {
-		repo domain.AccountRepository
+		repo domain.AccountRepositoryReader
 	}
 	type args struct {
 		id *domain.ID
@@ -31,7 +31,7 @@ func TestFindAccount_Find(t *testing.T) {
 		{
 			name: "account not found error",
 			fields: fields{
-				repo: domain.NewAccountMock(nil, nil, repository.NewErrRegisterNotFound("account", "100")),
+				repo: domain.NewAccountRepositoryMock(nil, nil, repository.NewErrRegisterNotFound("account", "100")),
 			},
 			args: args{
 				id: domain.NewID(uint64(100)),
@@ -42,7 +42,7 @@ func TestFindAccount_Find(t *testing.T) {
 		{
 			name: "unknown repository error",
 			fields: fields{
-				repo: domain.NewAccountMock(nil, nil, errors.New("some repository error")),
+				repo: domain.NewAccountRepositoryMock(nil, nil, errors.New("some repository error")),
 			},
 			args: args{
 				id: domain.NewID(uint64(100)),
@@ -53,7 +53,7 @@ func TestFindAccount_Find(t *testing.T) {
 		{
 			name: "account found successfully",
 			fields: fields{
-				repo: domain.NewAccountMock(nil, accountOK, nil),
+				repo: domain.NewAccountRepositoryMock(nil, accountOK, nil),
 			},
 			args: args{
 				id: domain.NewID(uint64(100)),

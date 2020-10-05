@@ -11,7 +11,7 @@ import (
 
 func TestCreateAccount(t *testing.T) {
 	type fields struct {
-		repo domain.AccountRepository
+		repo domain.AccountRepositoryWriter
 	}
 	type args struct {
 		documentNumber string
@@ -25,7 +25,7 @@ func TestCreateAccount(t *testing.T) {
 		{
 			name: "domain error when the document number is invalid",
 			fields: fields{
-				repo: domain.NewAccountMock(nil, nil, nil),
+				repo: domain.NewAccountRepositoryMock(nil, nil, nil),
 			},
 			args: args{
 				documentNumber: "00000000000",
@@ -35,7 +35,7 @@ func TestCreateAccount(t *testing.T) {
 		{
 			name: "repository error when the document numbers is duplicate",
 			fields: fields{
-				repo: domain.NewAccountMock(nil, nil, repository.NewErrDuplicatedEntry("document number", "duplicate entry 00000000191")),
+				repo: domain.NewAccountRepositoryMock(nil, nil, repository.NewErrDuplicatedEntry("document number", "duplicate entry 00000000191")),
 			},
 			args: args{
 				documentNumber: "00000000191",
@@ -45,7 +45,7 @@ func TestCreateAccount(t *testing.T) {
 		{
 			name: "account created successfully",
 			fields: fields{
-				repo: domain.NewAccountMock(domain.NewID(1000), nil, nil),
+				repo: domain.NewAccountRepositoryMock(domain.NewID(1000), nil, nil),
 			},
 			args: args{
 				documentNumber: "00000000191",
@@ -69,7 +69,7 @@ func TestCreateAccount(t *testing.T) {
 			}
 
 			if got.ID().Value() <= 0 {
-				t.Errorf("Invalid Account result: ID it must be greater than zero")
+				t.Errorf("Invalid AccountWriter result: ID it must be greater than zero")
 				return
 			}
 		})

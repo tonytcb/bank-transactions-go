@@ -25,7 +25,7 @@ func NewAccount(documentNumber DocumentNumber) (*Account, error) {
 }
 
 // Store stores an account given a Repository
-func (a *Account) Store(repo AccountRepository) (*Account, error) {
+func (a *Account) Store(repo AccountRepositoryWriter) (*Account, error) {
 	id, err := repo.Store(a)
 	if err != nil {
 		// todo add context to the error

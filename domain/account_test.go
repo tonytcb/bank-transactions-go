@@ -67,7 +67,7 @@ func TestAccount_Store(t *testing.T) {
 	}
 
 	type args struct {
-		repo AccountRepository
+		repo AccountRepositoryWriter
 	}
 
 	tests := []struct {
@@ -79,7 +79,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name: "store successful",
 			args: args{
-				repo: NewAccountMock(NewID(uint64(1)), nil, nil),
+				repo: NewAccountRepositoryMock(NewID(uint64(1)), nil, nil),
 			},
 			want: &Account{
 				id: NewID(uint64(1)),
@@ -89,7 +89,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name: "store error",
 			args: args{
-				repo: NewAccountMock(nil, nil, errors.New("unknown repository error")),
+				repo: NewAccountRepositoryMock(nil, nil, errors.New("unknown repository error")),
 			},
 			want:    nil,
 			wantErr: errors.New("unknown repository error"),

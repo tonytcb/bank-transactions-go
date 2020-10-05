@@ -6,11 +6,11 @@ import (
 
 // CreateAccount contains all the dependencies to create an account
 type CreateAccount struct {
-	repo domain.AccountRepository
+	repo domain.AccountRepositoryWriter
 }
 
 // NewCreateAccount creates a new CreateAccount with its dependencies
-func NewCreateAccount(repo domain.AccountRepository) *CreateAccount {
+func NewCreateAccount(repo domain.AccountRepositoryWriter) *CreateAccount {
 	return &CreateAccount{repo: repo}
 }
 

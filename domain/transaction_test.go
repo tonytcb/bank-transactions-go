@@ -152,7 +152,7 @@ func TestTransaction_Store(t *testing.T) {
 	transaction, _ := NewTransaction(NewID(uint64(1)), NewID(uint64(1)), 100)
 
 	type args struct {
-		repo TransactionRepository
+		repo TransactionRepositoryWriter
 	}
 	tests := []struct {
 		name    string

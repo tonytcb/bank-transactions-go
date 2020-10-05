@@ -1,23 +1,23 @@
 package domain
 
-// TransactionRepository represents the behaviour of the Transaction Repository
-type TransactionRepository interface {
+// TransactionRepositoryWriter represents the behaviour of the Transaction Repository
+type TransactionRepositoryWriter interface {
 	Store(*Transaction) (*ID, error)
 }
 
-// TransactionRepositoryMock is a fake representation of a TransactionRepository, useful to create unit tests
-type TransactionRepositoryMock struct {
+// TransactionRepositoryWriterMock is a fake representation of a TransactionRepositoryWriter, useful to create unit tests
+type TransactionRepositoryWriterMock struct {
 	id  *ID
 	err error
 }
 
-// NewTransactionRepositoryMock builds a new TransactionRepositoryMock struct with its mock results
-func NewTransactionRepositoryMock(id *ID, err error) *TransactionRepositoryMock {
-	return &TransactionRepositoryMock{id: id, err: err}
+// NewTransactionRepositoryMock builds a new TransactionRepositoryWriterMock struct with its mock results
+func NewTransactionRepositoryMock(id *ID, err error) *TransactionRepositoryWriterMock {
+	return &TransactionRepositoryWriterMock{id: id, err: err}
 }
 
 // Store stores a transaction
-func (t TransactionRepositoryMock) Store(_ *Transaction) (*ID, error) {
+func (t TransactionRepositoryWriterMock) Store(_ *Transaction) (*ID, error) {
 	if t.err != nil {
 		return nil, t.err
 	}

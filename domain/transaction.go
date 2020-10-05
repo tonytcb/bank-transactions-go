@@ -35,7 +35,7 @@ func NewTransaction(accountID *ID, operationID *ID, amount float64) (*Transactio
 }
 
 // Store stores a transaction given a repository
-func (t *Transaction) Store(repo TransactionRepository) (*Transaction, error) {
+func (t *Transaction) Store(repo TransactionRepositoryWriter) (*Transaction, error) {
 	id, err := repo.Store(t)
 	if err != nil {
 		return nil, err

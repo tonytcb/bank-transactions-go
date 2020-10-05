@@ -6,11 +6,11 @@ import (
 
 // CreateTransaction contains all the dependencies to create a transaction
 type CreateTransaction struct {
-	repo domain.TransactionRepository
+	repo domain.TransactionRepositoryWriter
 }
 
 // NewCreateTransaction creates a new CreateTransaction with its dependencies
-func NewCreateTransaction(repo domain.TransactionRepository) *CreateTransaction {
+func NewCreateTransaction(repo domain.TransactionRepositoryWriter) *CreateTransaction {
 	return &CreateTransaction{repo: repo}
 }
 
