@@ -38,11 +38,12 @@ func (h CreateTransaction) Handler(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	request := &createTransactionPayloadRequest{}
-	if err := json.Unmarshal(payload, request); err != nil {
+	request := createTransactionPayloadRequest{}
+
+	if err := json.Unmarshal(payload, &request); err != nil {
 		h.logger.Println("invalid payload:", err)
 
-		errResponse := newErrorResponse(map[string]string{"root": "payload must be a valid JSON"})
+		errResponse := newErrorResponse(map[string]string{"root": "invalid payload"})
 		responder.badRequest(errResponse.Encode())
 
 		return

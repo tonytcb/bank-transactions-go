@@ -59,7 +59,7 @@ func TestCreateTransaction_Handler(t *testing.T) {
 			args: args{
 				payload: bytes.NewReader([]byte("")),
 			},
-			wantPayloadResponse: `{"errors":\[{"field":"root","description":"payload must be a valid JSON"}\]}`,
+			wantPayloadResponse: `{"errors":\[{"field":"root","description":"invalid payload"}\]}`,
 			wantHTTPStatusCode:  http.StatusBadRequest,
 		},
 		{

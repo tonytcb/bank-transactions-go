@@ -13,6 +13,10 @@ Por questões de segurança, nenhuma credencial de servidores está exposta ness
 ## Como Iniciar
 Após executar **make init** para definir as variáveis de ambiente, deve-se executar o comando **make up**, que fará o download de todas as dependências da aplicação e iniciará os containeres necessários para executar todos os casos de uso.  
 
+## Testes unitários
+
+Para executar os testes unitários deve-se estar com o container da aplicação rodando com **make up**, após isso, rodar **make test** para executar os testes unitários de todos os pacotes. 
+
 ## API REST
 A API HTTP está exposta através da porta 8080.
 

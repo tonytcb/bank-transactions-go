@@ -25,7 +25,7 @@ func main() {
 	}
 	defer db.Close()
 
-	var httpServer api.Server = http.NewServer(logger, db)
+	var httpServer api.Server = http.NewServer(logger, db, 8080)
 
 	httpServer.Listen()
 }

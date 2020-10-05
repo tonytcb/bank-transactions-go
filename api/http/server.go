@@ -2,6 +2,7 @@ package http
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -17,11 +18,12 @@ import (
 type Server struct {
 	logger  *log.Logger
 	storage *sql.DB
+	port    int
 }
 
 // NewServer creates a Server struct with its dependencies
-func NewServer(logger *log.Logger, storage *sql.DB) *Server {
-	return &Server{logger: logger, storage: storage}
+func NewServer(logger *log.Logger, storage *sql.DB, port int) *Server {
+	return &Server{logger: logger, storage: storage, port: port}
 }
 
 // Listen exposes the HTTP server running in the port 8080
@@ -38,7 +40,7 @@ func (s Server) Listen() {
 	e.GET("/accounts/:id", s.findAccountByIDHandler())
 	e.POST("/transactions", s.createTransactionHandler())
 
-	s.logger.Fatalln(e.Start(":8080"))
+	s.logger.Fatalln(e.Start(fmt.Sprintf(":%d", s.port)))
 }
 
 func (s Server) createAccountHandler() echo.HandlerFunc {
