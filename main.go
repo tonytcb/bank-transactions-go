@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"os"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func main() {
-	// todo improve the logger struct with common methods (INFO, WARN, ERROR, ...) and a way to track logs over the same process
+	// todo improve the logger struct with common methods (INFO, WARN, ERROR, ...) and a way to track logs through the same process
 
 	var logger = log.New(os.Stdout, "", log.LstdFlags|log.Lmicroseconds)
 
@@ -19,7 +20,7 @@ func main() {
 
 	db, err := newStorage()
 	if err != nil {
-		logger.Fatalln("error to create storage:", err.Error())
+		logger.Fatalln("error to start storage:", err.Error())
 		return
 	}
 	defer db.Close()
@@ -30,6 +31,10 @@ func main() {
 }
 
 func newStorage() (*sql.DB, error) {
+	if os.Getenv("MYSQL_HOST") == "" {
+		return nil, errors.New("storage environment credentials not defined")
+	}
+
 	return storage.NewMySQLConnection(storage.NewConfig(
 		os.Getenv("MYSQL_PORT"),
 		os.Getenv("MYSQL_HOST"),
